@@ -1,0 +1,74 @@
+{
+    "default": [
+        "name",
+        "id",
+        "description"
+    ],
+    "package": [
+        "code",
+        "type",
+        "version",
+        "DHIS2Version",
+        "DHIS2Build",
+        "name"
+    ],
+    "trackedEntityTypes": [
+        "name",
+        "id"
+    ],
+    "trackedEntityAttributes": [
+        "name",
+        "id",
+        "code",
+        "description"
+    ],
+    "dataSets": [
+        "name",
+        "id",
+        "dataEntryForm",
+        "sections"
+    ],
+    "sections": [
+        "name",
+        "id"
+    ],
+    "dataEntryForms": [
+        "name",
+        "id"
+    ],
+    "programs": [
+        "name",
+        "id",
+        "trackedEntityType.id"
+    ],
+    "programStages": [
+        "name",
+        "id",
+        "program.id"
+    ],
+    "programStageSections": [
+        "name",
+        "id",
+        "programStage.id"
+    ],
+    "programRules": [
+        "name",
+        "id"
+    ],
+    "programRuleActions": [
+        "name",
+        "id"
+    ],
+    "programRuleVariables": [
+        "name",
+        "id"
+    ],
+    "programTrackedEntityAttributes": [
+        "name",
+        "id"
+    ],
+    "visualizations": [
+        "name",
+        "id"
+    ]
+}
