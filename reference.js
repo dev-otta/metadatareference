@@ -2,13 +2,19 @@
 /*jshint node: true */
 
 const fs = require("fs");
+const path = require('path');
 const XLSX = require("xlsx");
 const XLSXs = require("xlsx-style");
 
 const args = process.argv.slice(2);
+const fileWriteName = path.basename(args[0], '.json') + '.xlsx';
+
+const funcs = {
+    nameByUID: nameByUID 
+};
 
 // Define fields to reference for each metadata object type:
-const fieldsToReference = JSON.parse(fs.readFileSync('objectFields.json'));
+//const fieldsToReference = JSON.parse(fs.readFileSync('objectFields.json'));
 
 main();
 
@@ -19,14 +25,18 @@ function main(){
 
 
 
-    // Initialize reference object
+    // Initialize reference object and metametadata object
     let reference = {};
+    let meta = metametadata(metadata);
+    let regex = new RegExp(/:(?<func>\w*)/);
+        
 
     // Iterate through metadata and create reference
     for (let objType in metadata) {
-        console.log(objType);
-        console.log(metadata[objType].length);
-        let fields = (fieldsToReference[objType] ? fieldsToReference[objType] : fieldsToReference['default']);
+        //console.log(objType + ' ' + metadata[objType].length);
+        //let fields = (fieldsToReference[objType] ? fieldsToReference[objType] : fieldsToReference['default']);
+        let fields = fieldsToReference['default'];
+        fields.splice(fields.length, 0, ...(fieldsToReference[objType] ? fieldsToReference[objType] : []));
 
         if (metadata[objType] && metadata[objType].length > 0) {
             /*
@@ -38,11 +48,19 @@ function main(){
 
             for (let obj of metadata[objType]) {
                 let a = [];
+                let func = undefined;
+
                 for (let field of fields) {
+                    
+                    if (match = field.match(regex)) {
+                        console.log('\nfunc:');
+                        console.log(match.groups.func);
+                        func = match.groups.func;
+                    };
+                    console.log(func);
                     // If field has . do something else
                     field = field.split('.');
                     if (field.length > 1) {
-                        console.log('!Deep!');
                         a.push(resolveValueByPath(obj, field));
                     } else {
                         a.push(obj[field[0]] ? obj[field[0]] : '');
@@ -59,7 +77,7 @@ function main(){
         let aoa = reference[objType];
         appendWorksheet(sheetFromArray(aoa, true), wrkBook, objType);
     }
-    saveWorkbook(wrkBook, 'poop.xlsx');
+    saveWorkbook(wrkBook, fileWriteName);
 };
 
 
@@ -131,4 +149,27 @@ function resolveValueByPath(obj, path){
     //console.log(path);
     //console.log(obj);
     return resolveValueByPath(obj[path[0]], path.slice(1));
+}
+
+function metametadata(metadata) {
+    let res = {};
+    for (objType in metadata) {
+        if (metadata[objType] && metadata[objType].length > 0) {
+
+            for (obj of metadata[objType]) {
+                
+                if (obj && obj.id && obj.name) {
+                    res[obj.id] = { "name": obj.name }
+                }
+            }
+        }
+    }
+    return res;
+}
+
+function nameByUID(uid, meta) {
+    if (meta[uid]) {
+        return meta[uid].name;
+    };
+    return undefined;
 }

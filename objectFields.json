@@ -1,8 +1,17 @@
 {
     "default": [
-        "name",
         "id",
+        "code",
+        "name",
+        "shortName",
         "description"
+    ],
+    "categories": [
+        "dataDimensionType",
+        "categoryOptions:name"
+    ],
+    "categoryCombos": [
+        "dataDimensionType"*
     ],
     "package": [
         "code",
@@ -12,63 +21,55 @@
         "DHIS2Build",
         "name"
     ],
+    "dataElements": [
+        "formName"*
+    ],
     "trackedEntityTypes": [
-        "name",
-        "id"
     ],
     "trackedEntityAttributes": [
-        "name",
-        "id",
-        "code",
-        "description"
     ],
     "dataSets": [
-        "name",
-        "id",
         "dataEntryForm",
         "sections"
     ],
     "sections": [
-        "name",
-        "id"
+        "dataSet.id:name"
     ],
     "dataEntryForms": [
-        "name",
-        "id"
     ],
-    "programs": [
-        "name",
-        "id",
-        "trackedEntityType.id"
+    "dashboards": [
+        "dashboardItems."
+    ],
+    "programs": [*
+        "trackedEntityType.id",
+        "enrollmentDateLabel",
+        "incidentDateLabel"
+    ],
+    "programNotificationTemplates": [
+
+        "subjectTemplate",
+        "messageTemplate"
     ],
     "programStages": [
-        "name",
-        "id",
         "program.id"
     ],
     "programStageSections": [
-        "name",
-        "id",
         "programStage.id"
     ],
     "programRules": [
-        "name",
-        "id"
     ],
     "programRuleActions": [
-        "name",
-        "id"
     ],
     "programRuleVariables": [
-        "name",
-        "id"
     ],
     "programTrackedEntityAttributes": [
-        "name",
-        "id"
     ],
     "visualizations": [
-        "name",
-        "id"
+    ],
+    "optionSets": [
+        *
+    ],
+    "options": [
+        *
     ]
 }
