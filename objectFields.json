@@ -8,10 +8,12 @@
     ],
     "categories": [
         "dataDimensionType",
-        "categoryOptions:name"
+        "categoryOptions:nameByUID"
     ],
     "categoryCombos": [
-        "dataDimensionType"*
+        "categories.id:nameByUID",
+        "categoryOptionCombos.id:namebyUID",
+        "dataDimensionType"
     ],
     "package": [
         "code",
@@ -22,7 +24,7 @@
         "name"
     ],
     "dataElements": [
-        "formName"*
+        "formName"
     ],
     "trackedEntityTypes": [
     ],
@@ -33,14 +35,23 @@
         "sections"
     ],
     "sections": [
-        "dataSet.id:name"
+        "dataSet.id:nameByUID"
     ],
     "dataEntryForms": [
     ],
     "dashboards": [
-        "dashboardItems."
+        "dashboardItems"
     ],
-    "programs": [*
+    "optionSets": [
+        
+    ],
+    "options": [
+        
+    ],
+    "predictors": [
+        "organisationUnitLevels"
+    ],
+    "programs": [
         "trackedEntityType.id",
         "enrollmentDateLabel",
         "incidentDateLabel"
@@ -64,12 +75,9 @@
     ],
     "programTrackedEntityAttributes": [
     ],
+    "validationRules": [
+        "organisationUnitLevels"
+    ],
     "visualizations": [
-    ],
-    "optionSets": [
-        *
-    ],
-    "options": [
-        *
     ]
 }
