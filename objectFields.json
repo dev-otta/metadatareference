@@ -8,11 +8,11 @@
     ],
     "categories": [
         "dataDimensionType",
-        "categoryOptions:nameByUID"
+        "categoryOptions:expandName"
     ],
     "categoryCombos": [
-        "categories.id:nameByUID",
-        "categoryOptionCombos.id:namebyUID",
+        "categories.id:expandName",
+        "categoryOptionCombos.id:expandName",
         "dataDimensionType"
     ],
     "package": [
@@ -26,6 +26,9 @@
     "dataElements": [
         "formName"
     ],
+    "dataElementGroups": [
+        "dataElements.id:expandName"
+    ],
     "trackedEntityTypes": [
     ],
     "trackedEntityAttributes": [
@@ -35,7 +38,7 @@
         "sections"
     ],
     "sections": [
-        "dataSet.id:nameByUID"
+        "dataSet.id:expandName"
     ],
     "dataEntryForms": [
     ],
@@ -62,7 +65,11 @@
         "messageTemplate"
     ],
     "programStages": [
-        "program.id"
+        "program.id",
+        "programStageDataElements.id",
+        "programStageDataElements.dataElement.id:expandName",
+        "programStageDataElements.compulsory"
+
     ],
     "programStageSections": [
         "programStage.id"
@@ -74,6 +81,7 @@
     "programRuleVariables": [
     ],
     "programTrackedEntityAttributes": [
+        "compulsory"
     ],
     "validationRules": [
         "organisationUnitLevels"

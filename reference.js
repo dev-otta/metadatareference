@@ -10,11 +10,14 @@ const args = process.argv.slice(2);
 const fileWriteName = path.basename(args[0], '.json') + '.xlsx';
 
 const funcs = {
-    nameByUID: nameByUID
+    nameByUID: nameByUID,
+    expandName: expandName
 };
 
 // Define fields to reference for each metadata object type:
 const fieldsToReference = JSON.parse(fs.readFileSync('objectFields.json'));
+
+var meta = {};
 
 main();
 
@@ -27,15 +30,16 @@ function main() {
 
     // Initialize reference object and metametadata object
     let reference = {};
-    let meta = metametadata(metadata);
+    meta = metametadata(metadata);
     let regex = new RegExp(/:(?<func>\w*)/);
 
 
     // Iterate through metadata and create reference
     for (let objType in metadata) {
         //console.log(objType + ' ' + metadata[objType].length);
-        //let fields = (fieldsToReference[objType] ? fieldsToReference[objType] : fieldsToReference['default']);
-        let fields = fieldsToReference['default'];
+
+        let fields = Array.from(fieldsToReference['default']);
+        // Following modifies fieldsToReference!!!
         fields.splice(fields.length, 0, ...(fieldsToReference[objType] ? fieldsToReference[objType] : []));
 
         if (metadata[objType] && metadata[objType].length > 0) {
@@ -56,17 +60,8 @@ function main() {
                     let func = path.splice(1).toString();
                     path = path.toString();
 
-                    /*
-                    if (match = field.match(regex)) {
-                        console.log('\nfunc:');
-                        console.log(match.groups.func);
-                        func = match.groups.func;
-                        console.log(match);
-                    };
-                    */
 
-                    console.log(func);
-                    // If path has . do something else
+                    // If path is split with ".", resolve path to get value
                     path = path.split('.');
                     if (path.length > 1) {
                         val = (resolveValueByPath(obj, path));
@@ -76,29 +71,19 @@ function main() {
 
                     // Is val an Array?
                     if (Array.isArray(val)) {
-                        let vals = [];
-                        for (let element of val) {
+
+                        val = unpackArray(val, func);
+                    } else {
+                        if (func) {
                             try {
-                                vals.push = funcs[func](element, meta);
-                                
+                                val = funcs[func](val);
+
                             } catch (error) {
                                 console.error(error);
                                 console.log(`Func: ${func}`);
                             }
                         }
-                        val = vals.join(';');
-                    } else {
-
-                    if (func) {
-                        try {
-                            val = funcs[func](val, meta);
-                            
-                        } catch (error) {
-                            console.error(error);
-                            console.log(`Func: ${func}`);
-                        }
                     }
-                }
                     a.push(val);
                 }
                 // TODO Prune undefined columns from a
@@ -121,13 +106,13 @@ function sheetFromArray(aoa, header) {
     var range = XLSX.utils.decode_range(sheet["!ref"]);
     let colWidths = [];
 
-    // Prettyfy the output a little, adding alternating background color to rows, ...
+    // Prettify the output a little, adding alternating background color to rows, ...
     for (let R = range.s.r; R <= range.e.r; R++) {
         for (let C = range.s.c; C <= range.e.c; C++) {
             let cell = sheet[XLSXs.utils.encode_cell({ c: C, r: R })];
 
             if (cell == undefined) {
-                console.log('cell is undefined');
+                //console.log('cell is undefined');
                 continue;
             }
 
@@ -188,8 +173,8 @@ function resolveValueByPath(obj, path) {
         return resolveValueByPath(obj[path[0]], path.slice(1));
     } catch (error) {
         console.error(error);
-        console.log(obj)
-        console.log(path);
+        console.log(`Object: ${obj}`);
+        console.log(`Path: ${path}`);
     }
 }
 
@@ -209,18 +194,74 @@ function metametadata(metadata) {
     return res;
 }
 
-function nameByUID(uid, meta) {
-    // Check if uid is an Array
+function nameByUID(uid) {
     if (meta[uid]) {
         return meta[uid].name;
     };
-    return undefined;
+    return uid;
 }
-/*
-function nameByUID(uid, meta) {
+
+function expandName(uid) {
     if (meta[uid]) {
-        return meta[uid].name;
+        return `${uid} - ${meta[uid].name}`;
     };
-    return undefined;
+    return uid;
 }
-*/
+
+function unpackArray(arr, func) {
+    // Arrays in metadata usually contain objects. We usually want the "id" property.
+    let newArr = arr.map(element => {
+        if (typeof element === 'object') {
+            let val;
+            try {
+                if (func) {
+                    return funcs[func](element.id);
+                } else {
+                    return element.id;
+                }
+            } catch (error) {
+                throw error;
+            }
+        } else {
+            try {
+                if (func) {
+                    return funcs[func](element);
+                } else {
+                    return element.id;
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+    });
+
+    /*
+    arr.forEach((element) => {
+        if (typeof element === 'object') {
+            try {
+                //element = element.toString();
+                let values = Object.values(element);
+                values.forEach((val) => {
+                    if (func) {
+                        val = funcs[func](val);
+                    }
+                })
+                element = values.join(', ');
+            } catch (error) {
+                throw error;
+            }
+        } else {
+            if (func) {
+                try {
+                    element = funcs[func](element);
+                } catch (error) {
+                    throw error;
+                }
+            }
+        }
+        newArr.push(element);
+    });
+    */
+    
+    return newArr.join('; ');
+}
