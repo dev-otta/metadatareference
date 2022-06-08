@@ -39,14 +39,11 @@ function main() {
         //console.log(objType + ' ' + metadata[objType].length);
 
         let fields = Array.from(fieldsToReference['default']);
-        // Following modifies fieldsToReference!!!
+        
         fields.splice(fields.length, 0, ...(fieldsToReference[objType] ? fieldsToReference[objType] : []));
 
         if (metadata[objType] && metadata[objType].length > 0) {
-            /*
-            reference[objType] = [];
-            let aoa = reference[objType];
-            */
+
             let aoa = reference[objType] = [];
             aoa.push([...fields]);
 
@@ -235,33 +232,5 @@ function unpackArray(arr, func) {
         }
     });
 
-    /*
-    arr.forEach((element) => {
-        if (typeof element === 'object') {
-            try {
-                //element = element.toString();
-                let values = Object.values(element);
-                values.forEach((val) => {
-                    if (func) {
-                        val = funcs[func](val);
-                    }
-                })
-                element = values.join(', ');
-            } catch (error) {
-                throw error;
-            }
-        } else {
-            if (func) {
-                try {
-                    element = funcs[func](element);
-                } catch (error) {
-                    throw error;
-                }
-            }
-        }
-        newArr.push(element);
-    });
-    */
-    
     return newArr.join('; ');
 }
