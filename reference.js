@@ -36,7 +36,7 @@ function main() {
 
     // Iterate through metadata and create reference
     for (let objType in metadata) {
-        //console.log(objType + ' ' + metadata[objType].length);
+        console.log(objType + ' ' + metadata[objType].length);
 
         let fields = Array.from(fieldsToReference['default']);
         
@@ -49,31 +49,32 @@ function main() {
 
             for (let obj of metadata[objType]) {
                 let a = [];
-
+                
                 for (let field of fields) {
-                    let val;
+                    let thing = { "obj": obj, "path": null, "val": null };
+                    let func = null;
 
                     let path = field.split(':');
-                    let func = path.splice(1).toString();
-                    path = path.toString();
+                    func = path.splice(1).toString();
+                    thing.path = path.toString();
 
 
                     // If path is split with ".", resolve path to get value
-                    path = path.split('.');
-                    if (path.length > 1) {
-                        val = (resolveValueByPath(obj, path));
+                    thing.path = thing.path.split('.');
+                    if (thing.path.length > 1) {
+                        thing = (resolveValueByPath(thing));
                     } else {
-                        val = (obj[path[0]] ? obj[path[0]] : '');
+                        thing.val = (thing.obj[thing.path[0]] ? thing.obj[thing.path[0]] : '');
                     }
 
                     // Is val an Array?
-                    if (Array.isArray(val)) {
+                    if (Array.isArray(thing.val)) {
 
-                        val = unpackArray(val, func);
+                        thing.val = unpackArray(thing.val, thing.path, func);
                     } else {
                         if (func) {
                             try {
-                                val = funcs[func](val);
+                                thing.val = funcs[func](thing.val);
 
                             } catch (error) {
                                 console.error(error);
@@ -81,7 +82,7 @@ function main() {
                             }
                         }
                     }
-                    a.push(val);
+                    a.push(thing.val);
                 }
                 // TODO Prune undefined columns from a
                 aoa.push(a);
@@ -160,14 +161,26 @@ function saveWorkbook(book, file) {
     console.log("✔ Reference list saved");
 }
 
-function resolveValueByPath(obj, path) {
-    if (typeof path === 'string') path = path.split('.');
-    if (typeof obj === 'string') return obj;
-    if (Array.isArray(obj)) return obj;
+function resolveValueByPath(thing) {
+    if (typeof thing.path === 'string') thing.path = thing.path.split('.');
+    if (typeof thing.obj === 'string') {
+        thing.val = thing.obj;
+    return thing;
+    }
+    let what = thing.obj;
+    if (Array.isArray(what)) {
+        console.log(thing.obj);
+        thing.val = thing.obj;
+        return thing;
+    }
     //console.log(path);
     //console.log(obj);
     try {
-        return resolveValueByPath(obj[path[0]], path.slice(1));
+        let thePath = thing.path.slice(1);
+        // thing.path = thing.path.slice(1);
+        thing.obj = thing.obj[thing.path[0]];
+        thing.path = thePath;
+        return resolveValueByPath(thing);
     } catch (error) {
         console.error(error);
         console.log(`Object: ${obj}`);
@@ -205,14 +218,14 @@ function expandName(uid) {
     return uid;
 }
 
-function unpackArray(arr, func) {
+function unpackArray(arr, path, func) {
     // Arrays in metadata usually contain objects. We usually want the "id" property.
     let newArr = arr.map(element => {
         if (typeof element === 'object') {
             let val;
             try {
-                if (func) {
-                    return funcs[func](element.id);
+                if (func && path) {
+                    return funcs[func](element[path]);
                 } else {
                     return element.id;
                 }

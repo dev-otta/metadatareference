@@ -8,7 +8,7 @@
     ],
     "categories": [
         "dataDimensionType",
-        "categoryOptions:expandName"
+        "categoryOptions.id:expandName"
     ],
     "categoryCombos": [
         "categories.id:expandName",
@@ -43,7 +43,7 @@
     "dataEntryForms": [
     ],
     "dashboards": [
-        "dashboardItems"
+        "dashboardItems.id:expandName"
     ],
     "optionSets": [
         
