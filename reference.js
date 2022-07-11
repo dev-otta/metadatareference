@@ -6,6 +6,8 @@ const path = require('path');
 const XLSX = require("xlsx");
 const XLSXs = require("xlsx-style");
 
+const fieldsToReference = require("./objectFields.json");
+
 const args = process.argv.slice(2);
 const fileWriteName = path.basename(args[0], '.json') + '.xlsx';
 
@@ -15,7 +17,6 @@ const funcs = {
 };
 
 // Define fields to reference for each metadata object type:
-const fieldsToReference = JSON.parse(fs.readFileSync('objectFields.json'));
 
 var meta = {};
 
@@ -39,56 +40,104 @@ function main() {
         console.log(objType + ' ' + metadata[objType].length);
 
         let fields = Array.from(fieldsToReference['default']);
-        
+
         fields.splice(fields.length, 0, ...(fieldsToReference[objType] ? fieldsToReference[objType] : []));
 
-        if (metadata[objType] && metadata[objType].length > 0) {
+        if (!(metadata[objType] && metadata[objType].length > 0)) continue;
 
-            let aoa = reference[objType] = [];
-            aoa.push([...fields]);
+        let aoa = reference[objType] = [];
+        let headers = fields.map((val => val.replace(/:.+/, '')));
+        aoa.push([...headers]);
 
-            for (let obj of metadata[objType]) {
-                let a = [];
-                
-                for (let field of fields) {
-                    let thing = { "obj": obj, "path": null, "val": null };
-                    let func = null;
+        for (let obj of metadata[objType]) {
+            let a = [];
 
-                    let path = field.split(':');
-                    func = path.splice(1).toString();
-                    thing.path = path.toString();
+            for (let field of fields) {
+                let thing = { "obj": obj, "path": null, "val": null };
+                let func = null;
+
+                let path = field.split(':');
+                func = path.splice(1).toString();
+                thing.path = path.toString();
 
 
-                    // If path is split with ".", resolve path to get value
-                    thing.path = thing.path.split('.');
-                    if (thing.path.length > 1) {
-                        thing = (resolveValueByPath(thing));
-                    } else {
-                        thing.val = (thing.obj[thing.path[0]] ? thing.obj[thing.path[0]] : '');
-                    }
+                // If path is split with ".", resolve path to get value
+                thing.path = thing.path.split('.');
+                if (thing.path.length > 1) {
+                    thing = (resolveValueByPath(thing));
+                } else {
+                    thing.val = (thing.obj[thing.path[0]] ? thing.obj[thing.path[0]] : '');
+                }
 
-                    // Is val an Array?
-                    if (Array.isArray(thing.val)) {
+                // Is val an Array?
+                if (Array.isArray(thing.val)) {
 
-                        thing.val = unpackArray(thing.val, thing.path, func);
-                    } else {
-                        if (func) {
-                            try {
-                                thing.val = funcs[func](thing.val);
+                    thing.val = unpackArray(thing.val, thing.path, func);
+                } else {
+                    if (func) {
+                        try {
+                            thing.val = funcs[func](thing.val);
 
-                            } catch (error) {
-                                console.error(error);
-                                console.log(`Func: ${func}`);
-                            }
+                        } catch (error) {
+                            console.error(error);
+                            console.log(`Func: ${func}`);
                         }
                     }
-                    a.push(thing.val);
                 }
-                // TODO Prune undefined columns from a
-                aoa.push(a);
+                a.push(thing.val);
+            }
+            // TODO Prune undefined columns from a
+
+            aoa.push(a);
+            
+            
+        }
+        //pruneColumns(aoa);
+
+        /*
+        let empty = [];
+
+        for (let y in aoa) { // Why reference[objType],  not aoa?
+            if (y == 0) continue;
+            empty[y] = [];
+            for (let x in reference[objType][y]) {
+                let thing = (reference[objType][y][x]);
+                // console.log('X:');
+                // console.log(x);
+                // console.log(reference[objType][y][x]);
+                if (thing == '' || thing == undefined || thing == null) {
+                    empty[y][x] = true;
+                } else {
+                    empty[y][x] = false;
+                }
+
             }
         }
-    }
+        console.log(empty);
+
+        let isEmpty = [];
+        let x,y = 0;
+        for (let y in empty) {
+            if (y == 0) continue;
+            for (let x in empty[y]) {
+                isEmpty[x] = empty[y][x] || false;
+            }
+        }
+
+        console.log(isEmpty);
+        for (y in aoa) {
+            for (x in isEmpty) {
+                if (isEmpty[x]) {
+                    aoa[y].splice(x, 1);
+                }
+            }
+        }
+        */
+
+
+
+    } // objType loop end
+
     // Initialize and build excel workbook
     let wrkBook = createWorkbook();
     for (objType in reference) {
@@ -98,6 +147,133 @@ function main() {
     saveWorkbook(wrkBook, fileWriteName);
 };
 
+/*
+function pruneColumns(aoa) {
+
+}
+*/
+
+function resolveValueByPath(thing) {
+    if (typeof thing.path === 'string') thing.path = thing.path.split('.');
+    if (typeof thing.obj === 'string') {
+        thing.val = thing.obj;
+        return thing;
+    }
+    let what = thing.obj;
+    if (Array.isArray(what)) {
+
+        thing.val = thing.obj;
+        return thing;
+    }
+    //console.log(path);
+    //console.log(obj);
+    try {
+        let thePath = thing.path.slice(1);
+        // thing.path = thing.path.slice(1);
+        thing.obj = thing.obj[thing.path[0]];
+        thing.path = thePath;
+
+        // Sometimes we try to access properties not present in objects, e.g. categoryOptionCombos is in some, but not all, categoryCombos.
+        // In such a case we return an empty string.
+        if (thing.obj == null || thing.obj == undefined) {
+            thing.val = '';
+            thing.obj = '';
+        }
+        return resolveValueByPath(thing);
+    } catch (error) {
+        console.error(error);
+        console.log(`Object: ${obj}`);
+        console.log(`Path: ${path}`);
+    }
+}
+
+function unpackArray(arr, path, func) {
+    // Arrays in metadata usually contain objects. We usually want the "id" property.
+    let newArr = arr.map(element => {
+        if (typeof element === 'object') {
+            let val;
+            try {
+                if (func && path) {
+                    return funcs[func](element[path]);
+                } else {
+                    return element.id;
+                }
+            } catch (error) {
+                throw error;
+            }
+        } else {
+            try {
+                if (func) {
+                    return funcs[func](element);
+                } else {
+                    return element.id;
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+    });
+
+    return newArr.join('; ');
+}
+
+/*
+ * 
+ */
+function metametadata(metadata) {
+    let res = {};
+    for (objType in metadata) {
+        if (metadata[objType] && metadata[objType].length > 0) {
+
+            for (obj of metadata[objType]) {
+
+                if (obj && obj.id && obj.name) {
+                    res[obj.id] = { 'name': obj.name }
+                }
+            }
+        }
+    }
+    // DashboardItems
+    if (metadata.dashboards && metadata.dashboards.length > 0) {
+        for (dashboard of metadata.dashboards) {
+            if (dashboard.dashboardItems && dashboard.dashboardItems.length > 0) {
+                for (di of dashboard.dashboardItems) {
+                    try {
+                        let type = di.type;
+                        let uid;
+                        type = type.toLowerCase();
+                        if (di[type] && di[type].id) {
+                            uid = di[type].id;
+                        } else if (di.visualization && di.visualization.id) {
+                            uid = di.visualization.id;
+                        }
+                        if (uid) {
+                            res[di.id] = { 'name': res[uid].name }
+                        }
+                    } catch (error) {
+                        throw error;
+                    }
+                }
+            }
+        }
+    }
+
+    return res;
+}
+
+function nameByUID(uid) {
+    if (meta[uid]) {
+        return meta[uid].name;
+    };
+    return uid;
+}
+
+function expandName(uid) {
+    if (meta[uid]) {
+        return `${uid} - ${meta[uid].name}`;
+    };
+    return uid;
+}
 
 function sheetFromArray(aoa, header) {
     var sheet = XLSX.utils.aoa_to_sheet(aoa);
@@ -159,91 +335,4 @@ function appendWorksheet(sheet, book, name) {
 function saveWorkbook(book, file) {
     XLSXs.writeFile(book, file);
     console.log("✔ Reference list saved");
-}
-
-function resolveValueByPath(thing) {
-    if (typeof thing.path === 'string') thing.path = thing.path.split('.');
-    if (typeof thing.obj === 'string') {
-        thing.val = thing.obj;
-    return thing;
-    }
-    let what = thing.obj;
-    if (Array.isArray(what)) {
-        console.log(thing.obj);
-        thing.val = thing.obj;
-        return thing;
-    }
-    //console.log(path);
-    //console.log(obj);
-    try {
-        let thePath = thing.path.slice(1);
-        // thing.path = thing.path.slice(1);
-        thing.obj = thing.obj[thing.path[0]];
-        thing.path = thePath;
-        return resolveValueByPath(thing);
-    } catch (error) {
-        console.error(error);
-        console.log(`Object: ${obj}`);
-        console.log(`Path: ${path}`);
-    }
-}
-
-function metametadata(metadata) {
-    let res = {};
-    for (objType in metadata) {
-        if (metadata[objType] && metadata[objType].length > 0) {
-
-            for (obj of metadata[objType]) {
-
-                if (obj && obj.id && obj.name) {
-                    res[obj.id] = { "name": obj.name }
-                }
-            }
-        }
-    }
-    return res;
-}
-
-function nameByUID(uid) {
-    if (meta[uid]) {
-        return meta[uid].name;
-    };
-    return uid;
-}
-
-function expandName(uid) {
-    if (meta[uid]) {
-        return `${uid} - ${meta[uid].name}`;
-    };
-    return uid;
-}
-
-function unpackArray(arr, path, func) {
-    // Arrays in metadata usually contain objects. We usually want the "id" property.
-    let newArr = arr.map(element => {
-        if (typeof element === 'object') {
-            let val;
-            try {
-                if (func && path) {
-                    return funcs[func](element[path]);
-                } else {
-                    return element.id;
-                }
-            } catch (error) {
-                throw error;
-            }
-        } else {
-            try {
-                if (func) {
-                    return funcs[func](element);
-                } else {
-                    return element.id;
-                }
-            } catch (error) {
-                throw error;
-            }
-        }
-    });
-
-    return newArr.join('; ');
 }

@@ -15,6 +15,12 @@
         "categoryOptionCombos.id:expandName",
         "dataDimensionType"
     ],
+    "categoryOptionGroups": [
+        "categoryOptions.id:expandName"
+    ],
+    "categoryOptionGroupSets": [
+        "categoryOptionGroups.id:expandName"
+    ],
     "package": [
         "code",
         "type",
@@ -24,7 +30,12 @@
         "name"
     ],
     "dataElements": [
-        "formName"
+        "formName",
+        "valueType",
+        "domainType",
+        "aggregationType",
+        "legendSets.id:expandName",
+        "aggregationLevels"
     ],
     "dataElementGroups": [
         "dataElements.id:expandName"
@@ -34,16 +45,36 @@
     "trackedEntityAttributes": [
     ],
     "dataSets": [
+        "formType",
         "dataEntryForm",
-        "sections"
+        "sections.id:expandName",
+        "sharing.userGroups.id:expandName"
     ],
     "sections": [
-        "dataSet.id:expandName"
+        "dataSet.id:expandName",
+        "dataElements.id:expandName"
     ],
     "dataEntryForms": [
     ],
     "dashboards": [
-        "dashboardItems.id:expandName"
+        "dashboardItems.id:expandName",
+        "sharing.userGroups.id:expandName"
+    ],
+    "indicators":[
+        "indicatorType.id:expandName",
+        "annualized",
+        "numerator",
+        "numeratorDescription",
+        "denominator",
+        "denominatorDescription",
+        "legendSets.id:expandName",
+        "decimals"
+    ],
+    "legendSets":[
+        "legends.id:expandName"
+    ],
+    "maps":[
+        "mapViews.id:expandName"
     ],
     "optionSets": [
         
@@ -52,7 +83,16 @@
         
     ],
     "predictors": [
+        "generator.description",
+        "generator.expression",
+        "output.id:expandName",
+        "outputCombo.id:expandName",
+        "periodType",
         "organisationUnitLevels"
+        
+    ],
+    "predictorGroups":[
+        "predictors.id:expandName"
     ],
     "programs": [
         "trackedEntityType.id",
@@ -84,8 +124,22 @@
         "compulsory"
     ],
     "validationRules": [
+        "instruction",
+        "leftSide.description",
+        "leftSide.expression",
+        "rightSide.description",
+        "rightSide.expression",
         "organisationUnitLevels"
     ],
+    "validationRuleGroups":[
+        "validationRules.id:expandName"
+
+    ],
     "visualizations": [
+        "type",
+        "title",
+        "subtitle",
+        "rangeAxisLabel",
+        "domainAxisLabel"
     ]
 }
