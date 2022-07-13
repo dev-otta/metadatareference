@@ -86,55 +86,9 @@ function main() {
                 }
                 a.push(thing.val);
             }
-            // TODO Prune undefined columns from a
-
             aoa.push(a);
-            
-            
         }
-        //pruneColumns(aoa);
-
-        /*
-        let empty = [];
-
-        for (let y in aoa) { // Why reference[objType],  not aoa?
-            if (y == 0) continue;
-            empty[y] = [];
-            for (let x in reference[objType][y]) {
-                let thing = (reference[objType][y][x]);
-                // console.log('X:');
-                // console.log(x);
-                // console.log(reference[objType][y][x]);
-                if (thing == '' || thing == undefined || thing == null) {
-                    empty[y][x] = true;
-                } else {
-                    empty[y][x] = false;
-                }
-
-            }
-        }
-        console.log(empty);
-
-        let isEmpty = [];
-        let x,y = 0;
-        for (let y in empty) {
-            if (y == 0) continue;
-            for (let x in empty[y]) {
-                isEmpty[x] = empty[y][x] || false;
-            }
-        }
-
-        console.log(isEmpty);
-        for (y in aoa) {
-            for (x in isEmpty) {
-                if (isEmpty[x]) {
-                    aoa[y].splice(x, 1);
-                }
-            }
-        }
-        */
-
-
+        aoa = pruneColumns(aoa);
 
     } // objType loop end
 
@@ -147,11 +101,28 @@ function main() {
     saveWorkbook(wrkBook, fileWriteName);
 };
 
-/*
 function pruneColumns(aoa) {
+    let content = aoa.slice(1);
+    let isEmpty = content.map((arr) => {
+        return arr.map((val) => (val == '' || val == undefined || val == null))
+    })
 
+    let emptyCol = isEmpty.reduce((acc, curr) => {
+        if (acc) {
+            return curr.map((val, index) => {
+                return (val || acc[index])
+            })
+        }
+    })
+
+    for (let emptyIndex = 0; emptyIndex < emptyCol.length; emptyIndex++) {
+        for (let arrayIndex = 0; arrayIndex < aoa.length; arrayIndex++) {
+            if (emptyCol[emptyIndex]) aoa[arrayIndex].splice(emptyIndex, 1);
+        }
+    }
+
+    return aoa;
 }
-*/
 
 function resolveValueByPath(thing) {
     if (typeof thing.path === 'string') thing.path = thing.path.split('.');
