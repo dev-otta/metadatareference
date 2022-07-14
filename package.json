@@ -1,0 +1,28 @@
+{
+  "name": "metadatareference",
+  "version": "1.0.0",
+  "description": "DHIS2 Metadata Package Reference Generator",
+  "main": "reference.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Morten Haugen",
+  "license": "MIT",
+  "dependencies": {
+    "xlsx": "^0.17.5",
+    "xlsx-style": "^0.8.13"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-otta/metadatareference.git"
+  },
+  "keywords": [
+    "metadata",
+    "reference"
+  ],
+  "bugs": {
+    "url": "https://github.com/dev-otta/metadatareference/issues"
+  },
+  "homepage": "https://github.com/dev-otta/metadatareference#readme"
+}

@@ -118,21 +118,7 @@ function pruneColumns(aoa) {
             }
         });
     }
-        /*
-    let emptyCol = isEmpty.reduce((acc, curr) => {
-        if (acc) {
-            return curr.map((val, index) => {
-                return (val || acc[index])
-            })
-        }
-    })
 
-    for (let emptyIndex = 0; emptyIndex < emptyCol.length; emptyIndex++) {
-        for (let arrayIndex = 0; arrayIndex < aoa.length; arrayIndex++) {
-            if (emptyCol[emptyIndex]) aoa[arrayIndex].splice(emptyIndex, 1);
-        }
-    }
-    */
     return aoa;
 }
 
