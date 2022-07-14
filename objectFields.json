@@ -35,7 +35,7 @@
         "domainType",
         "aggregationType",
         "legendSets.id:expandName",
-        "aggregationLevels"
+        "aggregationLevels:arrayJoin"
     ],
     "dataElementGroups": [
         "dataElements.id:expandName"

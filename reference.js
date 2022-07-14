@@ -13,7 +13,8 @@ const fileWriteName = path.basename(args[0], '.json') + '.xlsx';
 
 const funcs = {
     nameByUID: nameByUID,
-    expandName: expandName
+    expandName: expandName,
+    arrayJoin: arrayJoin
 };
 
 // Define fields to reference for each metadata object type:
@@ -107,6 +108,17 @@ function pruneColumns(aoa) {
         return arr.map((val) => (val == '' || val == undefined || val == null))
     })
 
+    // Flip isEmpty to create arrays from columns
+    flipIsEmpty = transpose(isEmpty);
+
+    for (let emptyIndex = flipIsEmpty.length -1; emptyIndex >= 0; emptyIndex--) {
+        aoa.forEach(arr => {
+            if (!flipIsEmpty[emptyIndex].includes(false)) {
+                arr.splice(emptyIndex, 1);
+            }
+        });
+    }
+        /*
     let emptyCol = isEmpty.reduce((acc, curr) => {
         if (acc) {
             return curr.map((val, index) => {
@@ -120,7 +132,7 @@ function pruneColumns(aoa) {
             if (emptyCol[emptyIndex]) aoa[arrayIndex].splice(emptyIndex, 1);
         }
     }
-
+    */
     return aoa;
 }
 
@@ -246,6 +258,11 @@ function expandName(uid) {
     return uid;
 }
 
+function arrayJoin(arr) {
+    console.log(arr);
+    return arr;
+}
+
 function sheetFromArray(aoa, header) {
     var sheet = XLSX.utils.aoa_to_sheet(aoa);
     var range = XLSX.utils.decode_range(sheet["!ref"]);
@@ -306,4 +323,8 @@ function appendWorksheet(sheet, book, name) {
 function saveWorkbook(book, file) {
     XLSXs.writeFile(book, file);
     console.log("✔ Reference list saved");
+}
+
+function transpose(aoa) {
+    return aoa[0].map((col, index) => aoa.map(row => row[index]));
 }
