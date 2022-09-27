@@ -35,10 +35,19 @@ function main() {
     meta = metametadata(metadata);
     let regex = new RegExp(/:(?<func>\w*)/);
 
+    // Package object
+    if (metadata['package']) {
+        let aoa = reference['package'] = [];
+        aoa.push(['key','value']);
+        for (const [key, value] of Object.entries(metadata['package'])) {
+            aoa.push([key, value]);
+        }
+    }
 
     // Iterate through metadata and create reference
     for (let objType in metadata) {
         //console.log(objType + ' ' + metadata[objType].length);
+        if (objType == 'package') continue;
 
         let fields = Array.from(fieldsToReference['default']);
 
