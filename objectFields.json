@@ -41,8 +41,10 @@
         "dataElements.id:expandName"
     ],
     "trackedEntityTypes": [
+        "trackedEntityTypeAttributes.id:expandName"
     ],
     "trackedEntityAttributes": [
+        "optionSet.id:expandName"
     ],
     "dataSets": [
         "formType",
@@ -53,8 +55,6 @@
     "sections": [
         "dataSet.id:expandName",
         "dataElements.id:expandName"
-    ],
-    "dataEntryForms": [
     ],
     "dashboards": [
         "dashboardItems.id:expandName",
@@ -77,10 +77,10 @@
         "mapViews.id:expandName"
     ],
     "optionSets": [
-        
+        "options.id:expandName"
     ],
     "options": [
-        
+        "optionSet.id:expandName"
     ],
     "predictors": [
         "generator.description",
@@ -88,8 +88,8 @@
         "output.id:expandName",
         "outputCombo.id:expandName",
         "periodType",
-        "organisationUnitLevels"
-        
+        "organisationUnitLevels",
+        "predictorGroups.id:expandName"
     ],
     "predictorGroups":[
         "predictors.id:expandName"
@@ -97,10 +97,10 @@
     "programs": [
         "trackedEntityType.id",
         "enrollmentDateLabel",
-        "incidentDateLabel"
+        "incidentDateLabel",
+        "programTrackedEntityAttributes.trackedEntityAttribute.id:expandName"
     ],
     "programNotificationTemplates": [
-
         "subjectTemplate",
         "messageTemplate"
     ],
@@ -109,19 +109,25 @@
         "programStageDataElements.id",
         "programStageDataElements.dataElement.id:expandName",
         "programStageDataElements.compulsory"
-
     ],
     "programStageSections": [
         "programStage.id"
     ],
     "programRules": [
+        "condition",
+        "program.id:expandName",
+        "programStage.id:expandName"
     ],
     "programRuleActions": [
+        "programRuleActionType",
+        "programRule.id:expandName",
+        "programStage.id:expandName",
+        "evaluationEnvironments"
     ],
     "programRuleVariables": [
-    ],
-    "programTrackedEntityAttributes": [
-        "compulsory"
+        "programRuleVariableSourceType",
+        "program.id:expandName",
+        "dataElement.id:expandName"
     ],
     "validationRules": [
         "instruction",
@@ -133,7 +139,6 @@
     ],
     "validationRuleGroups":[
         "validationRules.id:expandName"
-
     ],
     "visualizations": [
         "type",

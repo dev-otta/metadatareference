@@ -38,7 +38,7 @@ function main() {
 
     // Iterate through metadata and create reference
     for (let objType in metadata) {
-        console.log(objType + ' ' + metadata[objType].length);
+        //console.log(objType + ' ' + metadata[objType].length);
 
         let fields = Array.from(fieldsToReference['default']);
 
@@ -245,7 +245,7 @@ function expandName(uid) {
 }
 
 function arrayJoin(arr) {
-    console.log(arr);
+    //console.log(arr);
     return arr;
 }
 
