@@ -35,7 +35,8 @@
         "domainType",
         "aggregationType",
         "legendSets.id:expandName",
-        "aggregationLevels:arrayJoin"
+        "aggregationLevels:arrayJoin",
+        "categoryCombo.id:expandName"
     ],
     "dataElementGroups": [
         "dataElements.id:expandName"
@@ -122,7 +123,7 @@
         "programRuleActionType",
         "programRule.id:expandName",
         "programStage.id:expandName",
-        "evaluationEnvironments"
+        "evaluationEnvironments:arrayJoin"
     ],
     "programRuleVariables": [
         "programRuleVariableSourceType",

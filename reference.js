@@ -168,6 +168,7 @@ function resolveValueByPath(thing) {
 function unpackArray(arr, path, func) {
     // Arrays in metadata usually contain objects. We usually want the "id" property.
     let newArr = arr.map(element => {
+        // console.log(`unpackArray() typeof element = ${typeof element}`);
         if (typeof element === 'object') {
             let val;
             try {
@@ -179,6 +180,8 @@ function unpackArray(arr, path, func) {
             } catch (error) {
                 throw error;
             }
+        } else if (element === 'string') {
+            return element;
         } else {
             try {
                 if (func) {
@@ -248,7 +251,7 @@ function nameByUID(uid) {
 
 function expandName(uid) {
     if (meta[uid]) {
-        return `${uid} - ${meta[uid].name}`;
+        return `${uid} ${meta[uid].name}`;
     };
     return uid;
 }
